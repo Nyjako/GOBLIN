@@ -34,8 +34,8 @@ Since everything is header-only, installation is just:
 
 This project is dual-licensed under:
 
-- **MIT License**, and
-- **Public Domain**
+- **[MIT License](LICENSE-MIT)**, and
+- **[Public Domain](LICENSE-Unlicense)**
 
 You may use either license at your option.
 
