@@ -1,3 +1,10 @@
+/*
+    GOBLIN by Kacper Tucholski
+    https://github.com/Nyjako/GOBLIN
+
+    fileio.h — 64-bit file position helpers.
+*/
+
 #ifndef GOBLIN_FILEIO_H
 #define GOBLIN_FILEIO_H
 

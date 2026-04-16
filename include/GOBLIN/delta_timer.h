@@ -1,3 +1,10 @@
+/*
+    GOBLIN by Kacper Tucholski
+    https://github.com/Nyjako/GOBLIN
+
+    delta_timer.h — simple cross-platform high definition elapsed-time measurement.
+*/
+
 #ifndef GOBLIN_DELTA_TIMER_H
 #define GOBLIN_DELTA_TIMER_H
 
@@ -39,7 +46,7 @@ namespace goblin {
 
 #ifdef GOBLIN_DELTA_TIMER_IMPLEMENTATION
 
-void DeltaTimer_Start(goblin_DeltaTimer *t) {
+void goblin_DeltaTimer_Start(goblin_DeltaTimer *t) {
 #ifdef _WIN32
     QueryPerformanceFrequency(&t->freq);
     QueryPerformanceCounter(&t->start);
@@ -48,7 +55,7 @@ void DeltaTimer_Start(goblin_DeltaTimer *t) {
 #endif
 }
 
-double DeltaTimer_QuerySeconds(const goblin_DeltaTimer *t) {
+double goblin_DeltaTimer_QuerySeconds(const goblin_DeltaTimer *t) {
 #ifdef _WIN32
     LARGE_INTEGER now;
     QueryPerformanceCounter(&now);

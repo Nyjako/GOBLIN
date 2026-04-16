@@ -1,3 +1,10 @@
+/*
+    GOBLIN by Kacper Tucholski
+    https://github.com/Nyjako/GOBLIN
+
+    fnv1a.h — FNV-1a hash helpers for C strings.
+*/
+
 #ifndef GOBLIN_FNV1A_H
 #define GOBLIN_FNV1A_H
 
@@ -33,7 +40,7 @@ namespace goblin {
 }
 #endif
 
-#ifdef GOBLIN_CSTR_IMPLEMENTATION
+#ifdef GOBLIN_FNV1A_IMPLEMENTATION
 
 GOBLIN_FNV1A_TYPE goblin_fnv1a_cstr(const char *s)
 {
@@ -48,6 +55,6 @@ GOBLIN_FNV1A_TYPE goblin_fnv1a_cstr(const char *s)
     return hash;
 }
 
-#endif // GOBLIN_CSTR_IMPLEMENTATION
+#endif // GOBLIN_FNV1A_IMPLEMENTATION
 
 #endif // GOBLIN_FNV1A_H

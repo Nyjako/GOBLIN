@@ -1,3 +1,10 @@
+/*
+    GOBLIN by Kacper Tucholski
+    https://github.com/Nyjako/GOBLIN
+
+    dyn_array.h — macro-based dynamic array helpers.
+*/
+
 #ifndef GOBLIN_DYN_ARRAY_H
 #define GOBLIN_DYN_ARRAY_H
 
@@ -13,7 +20,6 @@ typedef struct NAME##_array {                                                   
                                                                                     \
 static inline int NAME##_array_reserve(NAME##_array *a, size_t new_capacity) {      \
     if (new_capacity <= a->capacity) return 1;                                      \
-    if (new_capacity > SIZE_MAX / sizeof(*a->items)) return 0;                      \
     TYPE *new_items = (TYPE *)realloc(a->items, new_capacity * sizeof(*new_items)); \
     if (!new_items) return 0;                                                       \
     a->items = new_items;                                                           \

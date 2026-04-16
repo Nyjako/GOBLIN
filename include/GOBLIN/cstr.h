@@ -1,3 +1,10 @@
+/*
+    GOBLIN by Kacper Tucholski
+    https://github.com/Nyjako/GOBLIN
+
+    cstr.h — small helpers for copying C strings.
+*/
+
 #ifndef GOBLIN_CSTR_H
 #define GOBLIN_CSTR_H
 
