@@ -30,11 +30,14 @@ void goblin_trim_cstr(char *s);
 namespace goblin {
     static inline char *copy_cstr(const char *s) { return goblin_copy_cstr(s); }
     static inline char *concat_cstr(const char *s1, const char *s2) { return goblin_concat_cstr(s1, s2); }
-    static inline char *variadic_concat_cstr(size_t n, ...) {
-        assert(1 && "Not sure how to do this nicely yet.");
-        // TODO: Implement variadic function in c++ comp layer.
-        return NULL;
+
+    // Not a huge fan of this but feels better than additional functions
+    template <typename... Args>
+    inline char *variadic_concat_cstr(Args... args)
+    {
+        return goblin_variadic_concat_cstr(sizeof...(Args), args...);
     }
+
     static inline void trim_start_cstr(char *s) { return goblin_trim_start_cstr(s); }
     static inline void trim_end_cstr(char *s) { return goblin_trim_end_cstr(s); }
     static inline void trim_cstr(char *s) { return goblin_trim_cstr(s); }
