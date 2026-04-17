@@ -6,13 +6,72 @@
 #define GOBLIN_CSTR_IMPLEMENTATION
 #include "../include/GOBLIN/cstr.h"
 
-int main(void) {
+static void test_copy(void)
+{
     char *s = goblin_copy_cstr("hello");
     assert(s != NULL);
     assert(strcmp(s, "hello") == 0);
     free(s);
 
     assert(goblin_copy_cstr(NULL) == NULL);
+}
+
+static void test_concat(void)
+{
+    char *s = goblin_concat_cstr("hello", "world");
+    assert(s != NULL);
+    assert(strcmp(s, "helloworld") == 0);
+    free(s);
+
+    assert(goblin_concat_cstr(NULL, "world") == NULL);
+    assert(goblin_concat_cstr("hello", NULL) == NULL);
+    assert(goblin_concat_cstr(NULL, NULL) == NULL);
+}
+
+static void test_trim_start(void)
+{
+    char buf[] = " \t\r\nhello";
+    goblin_trim_start_cstr(buf);
+    assert(strcmp(buf, "hello") == 0);
+
+    char buf2[] = "hello";
+    goblin_trim_start_cstr(buf2);
+    assert(strcmp(buf2, "hello") == 0);
+}
+
+static void test_trim_end(void)
+{
+    char buf[] = "hello \t\r\n";
+    goblin_trim_end_cstr(buf);
+    assert(strcmp(buf, "hello") == 0);
+
+    char buf2[] = "hello";
+    goblin_trim_end_cstr(buf2);
+    assert(strcmp(buf2, "hello") == 0);
+}
+
+static void test_trim(void)
+{
+    char buf[] = " \t\r\nhello world \t\r\n";
+    goblin_trim_cstr(buf);
+    assert(strcmp(buf, "hello world") == 0);
+
+    char buf2[] = "hello";
+    goblin_trim_cstr(buf2);
+    assert(strcmp(buf2, "hello") == 0);
+
+    char buf3[] = " \t\r\n";
+    goblin_trim_cstr(buf3);
+    assert(strcmp(buf3, "") == 0);
+}
+
+int main(void)
+{
+    test_copy();
+    test_concat();
+    test_trim_start();
+    test_trim_end();
+    test_trim();
 
     puts("cstr tests passed");
     return 0;
