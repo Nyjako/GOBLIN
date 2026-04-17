@@ -28,6 +28,34 @@ static void test_concat(void)
     assert(goblin_concat_cstr(NULL, NULL) == NULL);
 }
 
+static void test_variadic_concat(void)
+{
+    char *s;
+
+    s = goblin_variadic_concat_cstr(2, "hello", "world");
+    assert(s != NULL);
+    assert(strcmp(s, "helloworld") == 0);
+    free(s);
+
+    s = goblin_variadic_concat_cstr(4, "a", "b", "c", "d");
+    assert(s != NULL);
+    assert(strcmp(s, "abcd") == 0);
+    free(s);
+
+    s = goblin_variadic_concat_cstr(3, "hello", "", "world");
+    assert(s != NULL);
+    assert(strcmp(s, "helloworld") == 0);
+    free(s);
+
+    s = goblin_variadic_concat_cstr(0);
+    assert(s != NULL);
+    assert(strcmp(s, "") == 0);
+    free(s);
+
+    assert(goblin_variadic_concat_cstr(2, "hello", NULL) == NULL);
+    assert(goblin_variadic_concat_cstr(1, NULL) == NULL);
+}
+
 static void test_trim_start(void)
 {
     char buf[] = " \t\r\nhello";
@@ -69,6 +97,7 @@ int main(void)
 {
     test_copy();
     test_concat();
+    test_variadic_concat();
     test_trim_start();
     test_trim_end();
     test_trim();

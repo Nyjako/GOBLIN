@@ -8,9 +8,11 @@
 #ifndef GOBLIN_CSTR_H
 #define GOBLIN_CSTR_H
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdarg.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,6 +20,7 @@ extern "C" {
 
 char *goblin_copy_cstr(const char *s);
 char *goblin_concat_cstr(const char *s1, const char *s2);
+char *goblin_variadic_concat_cstr(size_t n, ...);
 void goblin_trim_start_cstr(char *s);
 void goblin_trim_end_cstr(char *s);
 void goblin_trim_cstr(char *s);
@@ -27,6 +30,11 @@ void goblin_trim_cstr(char *s);
 namespace goblin {
     static inline char *copy_cstr(const char *s) { return goblin_copy_cstr(s); }
     static inline char *concat_cstr(const char *s1, const char *s2) { return goblin_concat_cstr(s1, s2); }
+    static inline char *variadic_concat_cstr(size_t n, ...) {
+        assert(1 && "Not sure how to do this nicely yet.");
+        // TODO: Implement variadic function in c++ comp layer.
+        return NULL;
+    }
     static inline void trim_start_cstr(char *s) { return goblin_trim_start_cstr(s); }
     static inline void trim_end_cstr(char *s) { return goblin_trim_end_cstr(s); }
     static inline void trim_cstr(char *s) { return goblin_trim_cstr(s); }
@@ -65,7 +73,47 @@ char *goblin_concat_cstr(const char *s1, const char *s2)
     if (!result) return NULL;
 
     memcpy(result, s1, n1);
-    memcpy(result + n1, s2, n2 + 1);  /* copy s2 plus '\0' */
+    memcpy(result + n1, s2, n2 + 1);
+    return result;
+}
+
+char *goblin_variadic_concat_cstr(size_t n, ...)
+{
+    va_list args;
+    size_t total = 1;
+
+    va_start(args, n);
+    for (size_t i = 0; i < n; ++i) {
+        const char *s = va_arg(args, const char *);
+        if (!s) {
+            va_end(args);
+            return NULL;
+        }
+
+        size_t len = strlen(s);
+        if (len > SIZE_MAX - total) {
+            va_end(args);
+            return NULL;
+        }
+        total += len;
+    }
+    va_end(args);
+
+    char *result = (char *)malloc(total);
+    if (!result) return NULL;
+
+    char *dst = result;
+
+    va_start(args, n);
+    for (size_t i = 0; i < n; ++i) {
+        const char *s = va_arg(args, const char *);
+        size_t len = strlen(s);
+        memcpy(dst, s, len);
+        dst += len;
+    }
+    va_end(args);
+
+    *dst = '\0';
     return result;
 }
 
