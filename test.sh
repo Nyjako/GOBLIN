@@ -14,7 +14,7 @@ for src in "$TEST_DIR"/*.c; do
     exe="$BUILD_DIR/$name"
 
     echo "==> Building $name"
-    cc -Wall -Wextra -pedantic -I"$ROOT_DIR" "$src" -o "$exe"
+    cc -Wall -Wextra -pedantic -std=c99 -I"$ROOT_DIR" "$src" -o "$exe"
 
     echo "==> Running $name"
     "$exe"
