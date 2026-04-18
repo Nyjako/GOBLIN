@@ -13,17 +13,25 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdarg.h>
+#include <stdbool.h>
+#include "diagnostic.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 char *goblin_copy_cstr(const char *s);
+
 char *goblin_concat_cstr(const char *s1, const char *s2);
 char *goblin_variadic_concat_cstr(size_t n, ...);
+
 void goblin_trim_start_cstr(char *s);
 void goblin_trim_end_cstr(char *s);
 void goblin_trim_cstr(char *s);
+
+bool goblin_starts_with_cstr(const char *s, const char *prefix);
+bool goblin_ends_with_cstr(const char *s, const char *suffix);
+bool goblin_contains_cstr(const char *s, const char *needle);
 
 #ifdef __cplusplus
 }
@@ -41,6 +49,10 @@ namespace goblin {
     static inline void trim_start_cstr(char *s) { return goblin_trim_start_cstr(s); }
     static inline void trim_end_cstr(char *s) { return goblin_trim_end_cstr(s); }
     static inline void trim_cstr(char *s) { return goblin_trim_cstr(s); }
+
+    static inline bool starts_with_cstr(const char *s, const char *prefix) { return goblin_starts_with_cstr(s, prefix); }
+    static inline bool ends_with_cstr(const char *s, const char *suffix) { return goblin_ends_with_cstr(s, suffix); }
+    static inline bool contains_cstr(const char *s, const char *needle) { return goblin_contains_cstr(s, needle); }
 }
 #endif
 
@@ -175,6 +187,66 @@ void goblin_trim_cstr(char *s)
         memmove(s, start, n);
     }
     s[n] = '\0';
+}
+
+bool goblin_starts_with_cstr(const char *s, const char *prefix)
+{
+    if (!s || !prefix) return false;
+
+    while (*s && *prefix) {
+        if (*s != *prefix) {
+            return false;
+        }
+        ++s;
+        ++prefix;
+    }
+
+    return *prefix == '\0';
+}
+
+bool goblin_ends_with_cstr(const char *s, const char *suffix)
+{
+    // FIXME: I think it can be made faster and cleaner using memcmp but for now this thing will stay
+
+    if (!s || !suffix) return false;
+
+    const char *str_end = s;
+    const char *suf_end = suffix;
+
+    while (*str_end) { ++str_end; }
+    while (*suf_end) { ++suf_end; }
+
+    while (str_end > s && suf_end > suffix) {
+        if (str_end[-1] != suf_end[-1]) {
+            return false;
+        }
+        --str_end;
+        --suf_end;
+    }
+
+    return suf_end == suffix;
+}
+
+bool goblin_contains_cstr(const char *s, const char *needle)
+{
+    // TODO: Make it return position of the string instead of bool
+
+    if (!s || !needle) return false;
+    if (*needle == '\0') return true;
+
+    for (; *s; ++s) {
+        const char *a = s;
+        const char *b = needle;
+
+        while (*a && *b && *a == *b) {
+            ++a;
+            ++b;
+        }
+
+        if (*b == '\0') return true;
+    }
+
+    return false;
 }
 
 #endif // GOBLIN_CSTR_IMPLEMENTATION

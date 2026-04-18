@@ -93,6 +93,28 @@ static void test_trim(void)
     assert(strcmp(buf3, "") == 0);
 }
 
+static void test_starts_with(void)
+{
+    assert(goblin_starts_with_cstr("Hello, World!", "Hello"));
+    assert(goblin_starts_with_cstr("foo bar baz", "foo bar baz"));
+    assert(!goblin_starts_with_cstr("foo", "foo bar baz"));
+}
+
+static void test_ends_with(void)
+{
+    assert(goblin_ends_with_cstr("Hello, World!", "World!"));
+    assert(goblin_ends_with_cstr("foo bar baz", "foo bar baz"));
+    assert(!goblin_ends_with_cstr("foo", "foo bar baz"));
+}
+
+static void test_contains(void)
+{
+    assert(goblin_contains_cstr("Hello, World!", "Hello"));
+    assert(goblin_contains_cstr("foo bar baz", "foo bar baz"));
+    assert(goblin_contains_cstr("foo bar baz", "bar"));
+    assert(!goblin_contains_cstr("foo", "foo bar baz"));
+}
+
 int main(void)
 {
     test_copy();
@@ -101,6 +123,9 @@ int main(void)
     test_trim_start();
     test_trim_end();
     test_trim();
+    test_starts_with();
+    test_ends_with();
+    test_contains();
 
     puts("cstr tests passed");
     return 0;
