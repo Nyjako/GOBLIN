@@ -12,8 +12,6 @@ do {                                         \
     fprintf(stderr, "\n"); \
 } while (0)
 
-/* Public macros */
-
 #define UNIMPLEMENTED(...)                      \
 do {                                            \
     DIAG_PRINT("UNIMPLEMENTED:", __VA_ARGS__);  \
@@ -32,7 +30,6 @@ do {                                          \
     abort();                                  \
 } while (0)
 
-/* Optional: for switch fallthrough safety */
 #define ASSERT_NOT_REACHED()                             \
 do {                                                     \
     fprintf(stderr, "ASSERT_NOT_REACHED: %s:%d (%s)\n",  \
