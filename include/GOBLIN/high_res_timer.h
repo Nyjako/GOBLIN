@@ -2,11 +2,11 @@
     GOBLIN by Kacper Tucholski
     https://github.com/Nyjako/GOBLIN
 
-    delta_timer.h — simple cross-platform high definition elapsed-time measurement.
+    high_res_timer.h — simple cross-platform high definition elapsed-time measurement.
 */
 
-#ifndef GOBLIN_DELTA_TIMER_H
-#define GOBLIN_DELTA_TIMER_H
+#ifndef GOBLIN_HIGH_RES_TIMER_H
+#define GOBLIN_HIGH_RES_TIMER_H
 
 #ifdef _WIN32
   #include <windows.h>
@@ -25,28 +25,27 @@ typedef struct {
 #else
     struct timespec start;
 #endif
-} goblin_DeltaTimer;
+} goblin_timer;
 
 
-void goblin_DeltaTimer_Start(goblin_DeltaTimer *t);
-double goblin_DeltaTimer_QuerySeconds(const goblin_DeltaTimer *t);
+void goblin_timer_start(goblin_timer *t);
+double goblin_timer_elapsed_seconds(const goblin_timer *t);
 
 #ifdef __cplusplus
 }
 namespace goblin {
-    static inline void DeltaTimer_Start(goblin_DeltaTimer *t) {
-        goblin_DeltaTimer_Start(t);
+    static inline void timer_start(goblin_timer *t) {
+        goblin_timer_start(t);
     }
-    static inline double DeltaTimer_QuerySeconds(const goblin_DeltaTimer *t) {
-        return goblin_DeltaTimer_QuerySeconds(t);
+    static inline double timer_elapsed_seconds(const goblin_timer *t) {
+        return goblin_timer_elapsed_seconds(t);
     }
 }
 #endif
 
+#ifdef GOBLIN_HIGH_RES_TIMER_IMPLEMENTATION
 
-#ifdef GOBLIN_DELTA_TIMER_IMPLEMENTATION
-
-void goblin_DeltaTimer_Start(goblin_DeltaTimer *t) {
+void goblin_timer_start(goblin_timer *t) {
 #ifdef _WIN32
     QueryPerformanceFrequency(&t->freq);
     QueryPerformanceCounter(&t->start);
@@ -55,7 +54,7 @@ void goblin_DeltaTimer_Start(goblin_DeltaTimer *t) {
 #endif
 }
 
-double goblin_DeltaTimer_QuerySeconds(const goblin_DeltaTimer *t) {
+double goblin_timer_elapsed_seconds(const goblin_timer *t) {
 #ifdef _WIN32
     LARGE_INTEGER now;
     QueryPerformanceCounter(&now);
@@ -70,6 +69,6 @@ double goblin_DeltaTimer_QuerySeconds(const goblin_DeltaTimer *t) {
 #endif
 }
 
-#endif // GOBLIN_DELTA_TIMER_IMPLEMENTATION
+#endif // GOBLIN_HIGH_RES_TIMER_IMPLEMENTATION
 
-#endif // GOBLIN_DELTA_TIMER_H
+#endif // GOBLIN_HIGH_RES_TIMER_H

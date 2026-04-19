@@ -5,8 +5,8 @@
 #include <assert.h>
 #include <stdio.h>
 
-#define GOBLIN_DELTA_TIMER_IMPLEMENTATION
-#include "../include/GOBLIN/delta_timer.h"
+#define GOBLIN_HIGH_RES_TIMER_IMPLEMENTATION
+#include "../include/GOBLIN/high_res_timer.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -15,8 +15,8 @@
 #endif
 
 int main(void) {
-    goblin_DeltaTimer t;
-    goblin_DeltaTimer_Start(&t);
+    goblin_timer t;
+    goblin_timer_start(&t);
 
 #ifdef _WIN32
     Sleep(50);
@@ -25,7 +25,7 @@ int main(void) {
     nanosleep(&req, NULL);
 #endif
 
-    double s = goblin_DeltaTimer_QuerySeconds(&t);
+    double s = goblin_timer_elapsed_seconds(&t);
     assert(s >= 0.0);
 
     puts("delta_timer tests passed");
