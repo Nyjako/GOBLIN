@@ -4,7 +4,7 @@
 #include <threads.h>
 
 #define GOBLIN_PAR_FOR_EACH_IMPLEMENTATION
-#include "../include/GOBLIN/par_for_each.h"
+#include "../include/goblin/par_for_each.h"
 
 /* -----------------------------
    Test data types

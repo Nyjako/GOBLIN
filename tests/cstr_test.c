@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #define GOBLIN_CSTR_IMPLEMENTATION
-#include "../include/GOBLIN/cstr.h"
+#include "../include/goblin/cstr.h"
 
 static void test_copy(void)
 {

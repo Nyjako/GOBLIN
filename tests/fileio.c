@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #define GOBLIN_FILEIO_IMPLEMENTATION
-#include "../include/GOBLIN/fileio.h"
+#include "../include/goblin/fileio.h"
 
 int main(void) {
     FILE *f = tmpfile();

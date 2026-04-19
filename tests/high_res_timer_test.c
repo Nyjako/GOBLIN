@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 #define GOBLIN_HIGH_RES_TIMER_IMPLEMENTATION
-#include "../include/GOBLIN/high_res_timer.h"
+#include "../include/goblin/high_res_timer.h"
 
 #ifdef _WIN32
 #include <windows.h>

@@ -4,7 +4,7 @@
 
 #define GOBLIN_FNV1A_BITS 64
 #define GOBLIN_FNV1A_IMPLEMENTATION
-#include "../include/GOBLIN/fnv1a.h"
+#include "../include/goblin/fnv1a.h"
 
 int main(void) {
     assert(goblin_fnv1a_cstr("") == 14695981039346656037ull);

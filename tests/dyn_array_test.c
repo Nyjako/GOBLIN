@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "../include/GOBLIN/dyn_array.h"
+#include "../include/goblin/dyn_array.h"
 
 GOBLIN_DYN_ARRAY_DECL(intvec, int)
 
