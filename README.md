@@ -1,5 +1,7 @@
 # GOBLIN
 
+[![tests](https://github.com/Nyjako/GOBLIN/actions/workflows/tests.yml/badge.svg)](https://github.com/Nyjako/GOBLIN/actions/workflows/tests.yml)
+
 A tiny header-only collection of helpers, utilities, and questionable ideas.
 
 > **Not a framework. Not a standard library replacement. Just a stash of stuff.**
