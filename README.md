@@ -1,7 +1,5 @@
 # GOBLIN
 
-> **GOBLIN** — Great Obvious Bits, Lightly Improvised, Nicely arranged
-
 A tiny header-only collection of helpers, utilities, and questionable ideas.
 
 > **Not a framework. Not a standard library replacement. Just a stash of stuff.**
