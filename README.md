@@ -1,6 +1,7 @@
 # GOBLIN
 
-[![tests](https://github.com/Nyjako/GOBLIN/actions/workflows/tests.yml/badge.svg)](https://github.com/Nyjako/GOBLIN/actions/workflows/tests.yml)
+[![Tests Linux](https://github.com/Nyjako/GOBLIN/actions/workflows/tests-linux.yml/badge.svg)](https://github.com/Nyjako/GOBLIN/actions/workflows/tests-linux.yml)
+[![Tests Windows](https://github.com/Nyjako/GOBLIN/actions/workflows/tests-windows.yml/badge.svg)](https://github.com/Nyjako/GOBLIN/actions/workflows/tests-windows.yml)
 
 A tiny header-only collection of helpers, utilities, and questionable ideas.
 
