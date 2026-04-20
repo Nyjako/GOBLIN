@@ -9,11 +9,11 @@
 #define GOBLIN_PAR_FOR_EACH_H
 
 #include <assert.h>
-#include <pthread.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdatomic.h>
+#include <threads.h>
 
 #if __STDC_NO_THREADS__ == 1
     #error Threads are disabled "__STDC_NO_THREADS__" is set to 1
@@ -22,8 +22,6 @@
 #if !defined(__STDC_VERSION__) && __STDC_VERSION__ < 201112L
     #error For now only c11 or higher is supported
 #endif
-
-#include <threads.h>
 
 #ifdef __cplusplus
 extern "C" {
