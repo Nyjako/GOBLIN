@@ -21,7 +21,8 @@ Get-ChildItem -Path $testDir -Filter *.c -File | ForEach-Object {
     $exe = Join-Path $buildDir ($name + '.exe')
 
     Write-Host "==> Building $name (std=$std)"
-    & cl /nologo /W4 /TC "/std:$std" "/I$rootDir" $_.FullName "/Fe:$exe"
+    $extraFlags = if ($std -eq 'c11') { '/experimental:c11atomics' } else { '' }
+    & cl /nologo /W4 /TC "/std:$std" $extraFlags "/I$rootDir" $_.FullName "/Fe:$exe"
     if ($LASTEXITCODE -ne 0) {
         throw "Build failed for $name"
     }
