@@ -23,6 +23,10 @@
     #error For now only c11 or higher is supported
 #endif
 
+#ifdef _WIN32
+    #define ATOMIC_VAR_INIT(n) n
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
