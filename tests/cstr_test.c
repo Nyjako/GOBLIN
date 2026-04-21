@@ -109,10 +109,20 @@ static void test_ends_with(void)
 
 static void test_contains(void)
 {
-    assert(goblin_contains_cstr("Hello, World!", "Hello"));
-    assert(goblin_contains_cstr("foo bar baz", "foo bar baz"));
-    assert(goblin_contains_cstr("foo bar baz", "bar"));
-    assert(!goblin_contains_cstr("foo", "foo bar baz"));
+    assert(goblin_contains_cstr("Hello, World!", "Hello") == 0);
+    assert(goblin_contains_cstr("foo bar baz", "foo bar baz") == 0);
+    assert(goblin_contains_cstr("foo bar baz", "bar") == 4);
+    assert(goblin_contains_cstr("foo", "foo bar baz") == -1);
+    assert(goblin_contains_cstr("abc", "c") == 2);
+    assert(goblin_contains_cstr("abc", "") == 0);
+    assert(goblin_contains_cstr("", "") == 0);
+    assert(goblin_contains_cstr("", "a") == -1);
+    assert(goblin_contains_cstr("aaaaa", "aaa") == 0);
+    assert(goblin_contains_cstr("banana", "ana") == 1);
+    assert(goblin_contains_cstr("mississippi", "issip") == 4);
+    assert(goblin_contains_cstr("abc", "abcd") == -1);
+    assert(goblin_contains_cstr(NULL, "a") == -1);
+    assert(goblin_contains_cstr("a", NULL) == -1);
 }
 
 int main(void)

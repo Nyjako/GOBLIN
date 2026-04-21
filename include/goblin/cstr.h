@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <unistd.h>
 #include "diagnostic.h"
 
 #ifdef __cplusplus
@@ -31,7 +32,10 @@ void goblin_trim_cstr(char *s);
 
 bool goblin_starts_with_cstr(const char *s, const char *prefix);
 bool goblin_ends_with_cstr(const char *s, const char *suffix);
-bool goblin_contains_cstr(const char *s, const char *needle);
+/*
+    Returns index of start of substring or -1 if not found.
+*/
+ssize_t goblin_contains_cstr(const char *s, const char *needle);
 
 #ifdef __cplusplus
 }
@@ -52,7 +56,7 @@ namespace goblin {
 
     static inline bool starts_with_cstr(const char *s, const char *prefix) { return goblin_starts_with_cstr(s, prefix); }
     static inline bool ends_with_cstr(const char *s, const char *suffix) { return goblin_ends_with_cstr(s, suffix); }
-    static inline bool contains_cstr(const char *s, const char *needle) { return goblin_contains_cstr(s, needle); }
+    static inline ssize_t contains_cstr(const char *s, const char *needle) { return goblin_contains_cstr(s, needle); }
 }
 #endif
 
@@ -227,14 +231,12 @@ bool goblin_ends_with_cstr(const char *s, const char *suffix)
     return suf_end == suffix;
 }
 
-bool goblin_contains_cstr(const char *s, const char *needle)
+ssize_t goblin_contains_cstr(const char *s, const char *needle)
 {
-    // TODO: Make it return position of the string instead of bool
+    if (!s || !needle) return -1;
+    if (*needle == '\0') return 0;
 
-    if (!s || !needle) return false;
-    if (*needle == '\0') return true;
-
-    for (; *s; ++s) {
+    for (size_t counter = 0; *s; ++s, ++counter) {
         const char *a = s;
         const char *b = needle;
 
@@ -243,10 +245,10 @@ bool goblin_contains_cstr(const char *s, const char *needle)
             ++b;
         }
 
-        if (*b == '\0') return true;
+        if (*b == '\0') return (ssize_t)counter;
     }
 
-    return false;
+    return -1;
 }
 
 #endif // GOBLIN_CSTR_IMPLEMENTATION
