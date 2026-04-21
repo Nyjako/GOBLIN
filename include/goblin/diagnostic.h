@@ -1,3 +1,11 @@
+/*
+    GOBLIN by Kacper Tucholski
+    https://github.com/Nyjako/GOBLIN
+
+    diagnostic.h — diagnostic macros for unimplemented code, TODOs,
+    unreachable paths, and fatal assertion-style failures.
+*/
+
 #ifndef DIAGNOSTIC_H
 #define DIAGNOSTIC_H
 
