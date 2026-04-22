@@ -160,6 +160,56 @@ static void test_slice(void)
     free(s);
 }
 
+static void test_join(void)
+{
+    char *s;
+
+    const char *arr1[] = {"hello", "world", NULL};
+    s = goblin_join_cstr(arr1, " ");
+    assert(s != NULL);
+    assert(strcmp(s, "hello world") == 0);
+    free(s);
+
+    const char *arr2[] = {"hello", NULL};
+    s = goblin_join_cstr(arr2, ",");
+    assert(s != NULL);
+    assert(strcmp(s, "hello") == 0);
+    free(s);
+
+    const char *arr3[] = {"a", "b", "c", "d", NULL};
+    s = goblin_join_cstr(arr3, "-");
+    assert(s != NULL);
+    assert(strcmp(s, "a-b-c-d") == 0);
+    free(s);
+
+    const char *arr4[] = {"hello", "", "world", NULL};
+    s = goblin_join_cstr(arr4, ",");
+    assert(s != NULL);
+    assert(strcmp(s, "hello,,world") == 0);
+    free(s);
+
+    const char *arr5[] = {NULL};
+    s = goblin_join_cstr(arr5, ",");
+    assert(s != NULL);
+    assert(strcmp(s, "") == 0);
+    free(s);
+
+    const char *arr6[] = {"a", "b", "c", NULL};
+    s = goblin_join_cstr(arr6, "");
+    assert(s != NULL);
+    assert(strcmp(s, "abc") == 0);
+    free(s);
+
+    assert(goblin_join_cstr(NULL, ",") == NULL);
+    assert(goblin_join_cstr(arr1, NULL) == NULL);
+
+    const char *arr7[] = {"a", NULL, "b", NULL};
+    s = goblin_join_cstr(arr7, ",");
+    assert(s != NULL);
+    assert(strcmp(s, "a") == 0);
+    free(s);
+}
+
 int main(void)
 {
     test_copy();
@@ -172,6 +222,7 @@ int main(void)
     test_ends_with();
     test_contains();
     test_slice();
+    test_join();
 
     puts("cstr tests passed");
     return 0;

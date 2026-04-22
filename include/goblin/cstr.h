@@ -50,6 +50,7 @@ bool goblin_starts_with_cstr(const char *s, const char *prefix);
 bool goblin_ends_with_cstr(const char *s, const char *suffix);
 
 char *goblin_slice_cstr(const char *s, size_t start, size_t end);
+char *goblin_join_cstr(const char **str_arr, const char *separator);
 
 #ifdef __cplusplus
 }
@@ -283,6 +284,50 @@ char *goblin_slice_cstr(const char *s, size_t start, size_t end)
     memcpy(result, s + start, slice_len);
     result[slice_len] = '\0';
 
+    return result;
+}
+
+char *goblin_join_cstr(const char **str_arr, const char *separator)
+{
+    if (!str_arr || !separator) { return NULL; }
+
+    size_t sep_len = strlen(separator);
+    size_t total_len = 0;
+    size_t count = 0;
+
+    for (const char **p = str_arr; *p; ++p) {
+        total_len += strlen(*p);
+        ++count;
+    }
+
+    if (count == 0) {
+        char *empty = malloc(1);
+        if (!empty) return NULL;
+        empty[0] = '\0';
+        return empty;
+    }
+
+    total_len += sep_len * (count - 1);
+
+    char *result = malloc(total_len + 1);
+    if (!result) {
+        return NULL;
+    }
+
+    char *dst = result;
+
+    for (size_t i = 0; str_arr[i]; ++i) {
+        size_t len = strlen(str_arr[i]);
+        memcpy(dst, str_arr[i], len);
+        dst += len;
+
+        if (str_arr[i + 1]) {
+            memcpy(dst, separator, sep_len);
+            dst += sep_len;
+        }
+    }
+
+    *dst = '\0';
     return result;
 }
 
