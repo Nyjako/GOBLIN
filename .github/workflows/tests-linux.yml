@@ -13,6 +13,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run tests
-        shell: bash
-        run: ./test.sh
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential
+
+      - name: Run C tests
+        run: |
+          set -e
+          mkdir -p build/tests
+          for src in tests/*.c; do
+            name=$(basename "$src" .c)
+            std="c99"
+            if [[ "$name" =~ \.c([0-9]+)$ ]]; then
+              std="c${BASH_REMATCH[1]}"
+              name="${name%.*}"
+            fi
+            exe="build/tests/$name"
+            echo "==> Building $name (std=$std)"
+            gcc -Wall -Wextra -pedantic -std="$std" -I. "$src" -o "$exe"
+            echo "==> Running $name"
+            "$exe"
+          done
+          echo "All tests passed."

@@ -12,7 +12,32 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
 
-      - name: Run tests
-        shell: cmd
-        run: test.cmd
+      - name: Run C tests
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          New-Item -ItemType Directory -Force -Path build\tests | Out-Null
+          Get-ChildItem tests\*.c | ForEach-Object {
+            $src = $_.FullName
+            $baseName = $_.BaseName
+            $std = "c11"
+            $name = $baseName
+            if ($baseName -match '\.c(\d+)$') {
+              $std = "c$($Matches[1])"
+              $name = $baseName -replace '\.c\d+$',''
+            }
+            $exe = "build\tests\$name.exe"
+            Write-Host "==> Building $name (std=$std)"
+            $clArgs = @("/nologo", "/W4", "/TC", "/std:$std", "/I.", $src, "/Fe:$exe")
+            if ($std -eq "c11") {
+              $clArgs += "/experimental:c11atomics"
+            }
+            & cl @clArgs
+            Write-Host "==> Running $name"
+            & $exe
+          }
+          Write-Host "All tests passed."
