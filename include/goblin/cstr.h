@@ -9,6 +9,7 @@
 #define GOBLIN_CSTR_H
 
 #include <assert.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -41,12 +42,14 @@ void goblin_trim_start_cstr(char *s);
 void goblin_trim_end_cstr(char *s);
 void goblin_trim_cstr(char *s);
 
-bool goblin_starts_with_cstr(const char *s, const char *prefix);
-bool goblin_ends_with_cstr(const char *s, const char *suffix);
 /*
     Returns index of start of substring or -1 if not found.
 */
 ssize_t goblin_contains_cstr(const char *s, const char *needle);
+bool goblin_starts_with_cstr(const char *s, const char *prefix);
+bool goblin_ends_with_cstr(const char *s, const char *suffix);
+
+char *goblin_slice_cstr(const char *s, size_t start, size_t end);
 
 #ifdef __cplusplus
 }
@@ -68,9 +71,12 @@ namespace goblin {
     static inline bool starts_with_cstr(const char *s, const char *prefix) { return goblin_starts_with_cstr(s, prefix); }
     static inline bool ends_with_cstr(const char *s, const char *suffix) { return goblin_ends_with_cstr(s, suffix); }
     static inline ssize_t contains_cstr(const char *s, const char *needle) { return goblin_contains_cstr(s, needle); }
+
+    static inline ssize_t slice_cstr(const char *s, size_t start, size_t end) { return goblin_slice_cstr(s, start, end); }
 }
 #endif
 
+#define GOBLIN_CSTR_IMPLEMENTATION
 #ifdef GOBLIN_CSTR_IMPLEMENTATION
 
 static inline int goblin_is_space(unsigned char c)
@@ -260,6 +266,24 @@ ssize_t goblin_contains_cstr(const char *s, const char *needle)
     }
 
     return -1;
+}
+
+char *goblin_slice_cstr(const char *s, size_t start, size_t end)
+{
+    if (!s || end <= start) { return NULL; }
+    if (end > strlen(s)) { return NULL; }
+
+    size_t slice_len = end - start;
+
+    char *result = malloc(end - start + 1);
+        if (!result) {
+        return NULL;
+    }
+
+    memcpy(result, s + start, slice_len);
+    result[slice_len] = '\0';
+
+    return result;
 }
 
 #endif // GOBLIN_CSTR_IMPLEMENTATION

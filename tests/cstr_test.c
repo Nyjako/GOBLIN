@@ -125,6 +125,41 @@ static void test_contains(void)
     assert(goblin_contains_cstr("a", NULL) == -1);
 }
 
+static void test_slice(void)
+{
+    char *s;
+    s = goblin_slice_cstr("hello", 0, 5);
+    assert(s != NULL);
+    assert(strcmp(s, "hello") == 0);
+    free(s);
+
+    s = goblin_slice_cstr("hello", 1, 4);
+    assert(s != NULL);
+    assert(strcmp(s, "ell") == 0);
+    free(s);
+
+    s = goblin_slice_cstr("hello", 2, 3);
+    assert(s != NULL);
+    assert(strcmp(s, "l") == 0);
+    free(s);
+
+    s = goblin_slice_cstr("hello", 3, 5);
+    assert(s != NULL);
+    assert(strcmp(s, "lo") == 0);
+    free(s);
+
+    assert(goblin_slice_cstr("hello", 2, 2) == NULL);
+    assert(goblin_slice_cstr("hello", 5, 2) == NULL);
+    assert(goblin_slice_cstr("hello", 0, 6) == NULL);
+    assert(goblin_slice_cstr(NULL, 0, 1) == NULL);
+
+    size_t len = strlen("hello");
+    s = goblin_slice_cstr("hello", 0, len);
+    assert(s != NULL);
+    assert(strcmp(s, "hello") == 0);
+    free(s);
+}
+
 int main(void)
 {
     test_copy();
@@ -136,6 +171,7 @@ int main(void)
     test_starts_with();
     test_ends_with();
     test_contains();
+    test_slice();
 
     puts("cstr tests passed");
     return 0;
