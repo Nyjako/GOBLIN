@@ -252,6 +252,99 @@ static void test_to_lower(void)
     goblin_to_lower_cstr(NULL);
 }
 
+static void test_replace_first(void)
+{
+    char *s;
+
+    s = goblin_replace_first_cstr("hello world", "world", "goblin");
+    assert(s != NULL);
+    assert(strcmp(s, "hello goblin") == 0);
+    free(s);
+
+    s = goblin_replace_first_cstr("abc abc", "abc", "x");
+    assert(s != NULL);
+    assert(strcmp(s, "x abc") == 0);
+    free(s);
+
+    s = goblin_replace_first_cstr("foo bar baz", "bar", "xxx");
+    assert(s != NULL);
+    assert(strcmp(s, "foo xxx baz") == 0);
+    free(s);
+
+    s = goblin_replace_first_cstr("hello", "xyz", "123");
+    assert(s != NULL);
+    assert(strcmp(s, "hello") == 0);
+    free(s);
+
+    s = goblin_replace_first_cstr("a b c", "b", "LONG");
+    assert(s != NULL);
+    assert(strcmp(s, "a LONG c") == 0);
+    free(s);
+
+    s = goblin_replace_first_cstr("a LONG c", "LONG", "b");
+    assert(s != NULL);
+    assert(strcmp(s, "a b c") == 0);
+    free(s);
+
+    s = goblin_replace_first_cstr("hello", "", "x");
+    assert(s != NULL);
+    assert(strcmp(s, "hello") == 0);
+    free(s);
+
+    assert(goblin_replace_first_cstr(NULL, "a", "b") == NULL);
+    assert(goblin_replace_first_cstr("a", NULL, "b") == NULL);
+    assert(goblin_replace_first_cstr("a", "b", NULL) == NULL);
+}
+
+static void test_replace(void)
+{
+    char *s;
+
+    s = goblin_replace_cstr("foo bar foo", "foo", "baz");
+    assert(s != NULL);
+    assert(strcmp(s, "baz bar baz") == 0);
+    free(s);
+
+    s = goblin_replace_cstr("hello", "xyz", "123");
+    assert(s != NULL);
+    assert(strcmp(s, "hello") == 0);
+    free(s);
+
+    s = goblin_replace_cstr("a b b", "b", "LONG");
+    assert(s != NULL);
+    assert(strcmp(s, "a LONG LONG") == 0);
+    free(s);
+
+    s = goblin_replace_cstr("a LONG LONG", "LONG", "b");
+    assert(s != NULL);
+    assert(strcmp(s, "a b b") == 0);
+    free(s);
+
+    s = goblin_replace_cstr("aaaaa", "aa", "b");
+    assert(s != NULL);
+    assert(strcmp(s, "bba") == 0);
+    free(s);
+
+    s = goblin_replace_cstr("abc", "abc", "x");
+    assert(s != NULL);
+    assert(strcmp(s, "x") == 0);
+    free(s);
+
+    s = goblin_replace_cstr("hello", "", "x");
+    assert(s != NULL);
+    assert(strcmp(s, "hello") == 0);
+    free(s);
+
+    s = goblin_replace_cstr("a b c", " ", "");
+    assert(s != NULL);
+    assert(strcmp(s, "abc") == 0);
+    free(s);
+
+    assert(goblin_replace_cstr(NULL, "a", "b") == NULL);
+    assert(goblin_replace_cstr("a", NULL, "b") == NULL);
+    assert(goblin_replace_cstr("a", "b", NULL) == NULL);
+}
+
 int main(void)
 {
     test_copy();
@@ -267,6 +360,8 @@ int main(void)
     test_join();
     test_to_upper();
     test_to_lower();
+    test_replace_first();
+    test_replace();
 
     puts("cstr tests passed");
     return 0;

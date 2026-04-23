@@ -10,6 +10,7 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -60,6 +61,9 @@ bool goblin_ends_with_cstr(const char *s, const char *suffix);
 
 char *goblin_slice_cstr(const char *s, size_t start, size_t end);
 char *goblin_join_cstr(const char **str_arr, const char *separator);
+
+char *goblin_replace_first_cstr(const char *src, const char *search, const char *replace);
+char *goblin_replace_cstr(const char *src, const char *search, const char *replace);
 
 #ifdef __cplusplus
 }
@@ -361,6 +365,90 @@ char *goblin_join_cstr(const char **str_arr, const char *separator)
     }
 
     *dst = '\0';
+    return result;
+}
+
+char *goblin_replace_first_cstr(const char *src, const char *search, const char *replace)
+{
+    if (!src || !search || !replace) { return NULL; }
+
+    size_t search_len = strlen(search);
+
+    if (search_len == 0) { return goblin_copy_cstr(src); }
+
+    ssize_t i = goblin_contains_cstr(src, search);
+
+    if (i == -1) { return goblin_copy_cstr(src); }
+
+    size_t src_len = strlen(src);
+    size_t replace_len = strlen(replace);
+
+    size_t new_len = src_len - search_len + replace_len;
+
+    char *result = malloc(new_len + 1);
+    if (!result) { return NULL; }
+
+    memcpy(result, src, i);
+    memcpy(result + i, replace, replace_len);
+    memcpy(result + i + replace_len, src + i + search_len, src_len - (i + search_len));
+
+    result[new_len] = '\0';
+
+    return result;
+}
+
+char *goblin_replace_cstr(const char *src, const char *search, const char *replace)
+{
+    if (!src || !search || !replace) { return NULL; }
+
+    size_t search_len = strlen(search);
+    if (search_len == 0) { return goblin_copy_cstr(src); }
+
+    size_t src_len = strlen(src);
+    size_t replace_len = strlen(replace);
+
+    size_t count = 0;
+    const char *p = src;
+
+    while ((p = strstr(p, search)) != NULL) {
+        ++count;
+        p += search_len;
+    }
+
+    if (count == 0) { return goblin_copy_cstr(src); }
+
+    size_t new_len;
+    if (replace_len >= search_len) {
+        new_len = src_len + count * (replace_len - search_len);
+    } else {
+        new_len = src_len - count * (search_len - replace_len);
+    }
+
+    char *result = malloc(new_len + 1);
+    if (!result) { return NULL; }
+
+    char *dst = result;
+    const char *src_p = src;
+    const char *match;
+
+    while ((match = strstr(src_p, search)) != NULL) {
+        size_t chunk_len = (size_t)(match - src_p);
+
+        memcpy(dst, src_p, chunk_len);
+        dst += chunk_len;
+
+        memcpy(dst, replace, replace_len);
+        dst += replace_len;
+
+        src_p = match + search_len;
+    }
+
+    size_t tail_len = src_len - (src_p - src);
+    memcpy(dst, src_p, tail_len);
+    dst += tail_len;
+
+    result[new_len] = '\0';
+
     return result;
 }
 
