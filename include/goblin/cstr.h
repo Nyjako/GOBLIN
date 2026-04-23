@@ -43,6 +43,15 @@ void goblin_trim_end_cstr(char *s);
 void goblin_trim_cstr(char *s);
 
 /*
+    Works only for basic Latin.
+*/
+void goblin_to_upper_cstr(char *s);
+/*
+    Works only for basic Latin.
+*/
+void goblin_to_lower_cstr(char *s);
+
+/*
     Returns index of start of substring or -1 if not found.
 */
 ssize_t goblin_contains_cstr(const char *s, const char *needle);
@@ -74,10 +83,12 @@ namespace goblin {
     static inline ssize_t contains_cstr(const char *s, const char *needle) { return goblin_contains_cstr(s, needle); }
 
     static inline ssize_t slice_cstr(const char *s, size_t start, size_t end) { return goblin_slice_cstr(s, start, end); }
+
+    static inline void to_upper_cstr(char *s) { return goblin_to_upper_cstr(s); }
+    static inline void to_lower_cstr(char *s) { return goblin_to_lower_cstr(s); }
 }
 #endif
 
-#define GOBLIN_CSTR_IMPLEMENTATION
 #ifdef GOBLIN_CSTR_IMPLEMENTATION
 
 static inline int goblin_is_space(unsigned char c)
@@ -209,6 +220,27 @@ void goblin_trim_cstr(char *s)
         memmove(s, start, n);
     }
     s[n] = '\0';
+}
+
+void goblin_to_upper_cstr(char *s)
+{
+    // TODO: utf8
+    if (!s) { return; }
+
+    while (*s) {
+        if (*s >= 'a' && *s <= 'z') { *s -= 'a' - 'A'; }
+        ++s;
+    }
+}
+
+void goblin_to_lower_cstr(char *s)
+{
+    if (!s) { return; }
+
+    while (*s) {
+        if (*s >= 'A' && *s <= 'Z') { *s += 'a' - 'A'; }
+        ++s;
+    }
 }
 
 bool goblin_starts_with_cstr(const char *s, const char *prefix)

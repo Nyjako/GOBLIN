@@ -210,6 +210,48 @@ static void test_join(void)
     free(s);
 }
 
+static void test_to_upper(void)
+{
+    char buf1[] = "hello";
+    goblin_to_upper_cstr(buf1);
+    assert(strcmp(buf1, "HELLO") == 0);
+
+    char buf2[] = "Hello, World!";
+    goblin_to_upper_cstr(buf2);
+    assert(strcmp(buf2, "HELLO, WORLD!") == 0);
+
+    char buf3[] = "123abcXYZ";
+    goblin_to_upper_cstr(buf3);
+    assert(strcmp(buf3, "123ABCXYZ") == 0);
+
+    char buf4[] = "";
+    goblin_to_upper_cstr(buf4);
+    assert(strcmp(buf4, "") == 0);
+
+    goblin_to_upper_cstr(NULL);
+}
+
+static void test_to_lower(void)
+{
+    char buf1[] = "HELLO";
+    goblin_to_lower_cstr(buf1);
+    assert(strcmp(buf1, "hello") == 0);
+
+    char buf2[] = "Hello, World!";
+    goblin_to_lower_cstr(buf2);
+    assert(strcmp(buf2, "hello, world!") == 0);
+
+    char buf3[] = "123ABCxyz";
+    goblin_to_lower_cstr(buf3);
+    assert(strcmp(buf3, "123abcxyz") == 0);
+
+    char buf4[] = "";
+    goblin_to_lower_cstr(buf4);
+    assert(strcmp(buf4, "") == 0);
+
+    goblin_to_lower_cstr(NULL);
+}
+
 int main(void)
 {
     test_copy();
@@ -223,6 +265,8 @@ int main(void)
     test_contains();
     test_slice();
     test_join();
+    test_to_upper();
+    test_to_lower();
 
     puts("cstr tests passed");
     return 0;
