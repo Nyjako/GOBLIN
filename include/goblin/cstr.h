@@ -82,7 +82,8 @@ namespace goblin {
     static inline bool ends_with_cstr(const char *s, const char *suffix) { return goblin_ends_with_cstr(s, suffix); }
     static inline ssize_t contains_cstr(const char *s, const char *needle) { return goblin_contains_cstr(s, needle); }
 
-    static inline ssize_t slice_cstr(const char *s, size_t start, size_t end) { return goblin_slice_cstr(s, start, end); }
+    static inline char *slice_cstr(const char *s, size_t start, size_t end) { return goblin_slice_cstr(s, start, end); }
+    static inline char *join_cstr(const char *s, size_t start, size_t end) { return goblin_join_cstr(s, start, end); }
 
     static inline void to_upper_cstr(char *s) { return goblin_to_upper_cstr(s); }
     static inline void to_lower_cstr(char *s) { return goblin_to_lower_cstr(s); }
