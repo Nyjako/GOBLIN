@@ -9,14 +9,19 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cc: [gcc, clang]
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y build-essential
+        run: sudo apt-get update && sudo apt-get install -y build-essential clang
 
-      - name: Run C tests
+      - name: Run tests
+        env:
+          CC: ${{ matrix.cc }}
         run: |
           set -e
           mkdir -p build/tests
@@ -27,10 +32,26 @@ jobs:
               std="c${BASH_REMATCH[1]}"
               name="${name%.*}"
             fi
-            exe="build/tests/$name"
-            echo "==> Building $name (std=$std)"
-            gcc -Wall -Wextra -pedantic -std="$std" -I. "$src" -o "$exe"
-            echo "==> Running $name"
+            exe="build/tests/$name-$CC"
+            "$CC" -Wall -Wextra -pedantic -std="$std" -I. "$src" -o "$exe"
             "$exe"
           done
-          echo "All tests passed."
+
+  leak-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y clang
+
+      - name: Build and run with ASan/LSan
+        run: |
+          set -e
+          mkdir -p build/tests
+          for src in tests/*.c; do
+            name=$(basename "$src" .c)
+            exe="build/tests/$name-asan"
+            clang -g -O1 -fsanitize=address -fno-omit-frame-pointer -I. "$src" -o "$exe"
+            ASAN_OPTIONS=detect_leaks=1 "$exe"
+          done
