@@ -313,5 +313,4 @@ int goblin_par_for_each_shared(void *arr, size_t count, size_t elem_size, void *
 }
 
 #endif // GOBLIN_PAR_FOR_EACH_IMPLEMENTATION
-
 #endif // GOBLIN_PAR_FOR_EACH_H

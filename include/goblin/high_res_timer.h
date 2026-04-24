@@ -34,12 +34,8 @@ double goblin_timer_elapsed_seconds(const goblin_timer *t);
 #ifdef __cplusplus
 }
 namespace goblin {
-    static inline void timer_start(goblin_timer *t) {
-        goblin_timer_start(t);
-    }
-    static inline double timer_elapsed_seconds(const goblin_timer *t) {
-        return goblin_timer_elapsed_seconds(t);
-    }
+    static inline void timer_start(goblin_timer *t) { return goblin_timer_start(t); }
+    static inline double timer_elapsed_seconds(const goblin_timer *t) { return goblin_timer_elapsed_seconds(t); }
 }
 #endif
 
@@ -70,5 +66,4 @@ double goblin_timer_elapsed_seconds(const goblin_timer *t) {
 }
 
 #endif // GOBLIN_HIGH_RES_TIMER_IMPLEMENTATION
-
 #endif // GOBLIN_HIGH_RES_TIMER_H

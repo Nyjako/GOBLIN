@@ -92,8 +92,8 @@ namespace goblin {
     static inline void to_upper_cstr(char *s) { return goblin_to_upper_cstr(s); }
     static inline void to_lower_cstr(char *s) { return goblin_to_lower_cstr(s); }
 
-    static inline char *replace_first_cstr(const char *src, const char *search, const char *replace) { return goblin_replace_first_cstr(src, search, replace);  }
-    static inline char *replace_cstr(const char *src, const char *search, const char *replace) { return goblin_replace_cstr(src, search, replace);  }
+    static inline char *replace_first_cstr(const char *src, const char *search, const char *replace) { return goblin_replace_first_cstr(src, search, replace); }
+    static inline char *replace_cstr(const char *src, const char *search, const char *replace) { return goblin_replace_cstr(src, search, replace); }
 }
 #endif
 
