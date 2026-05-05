@@ -65,6 +65,11 @@ char *goblin_join_cstr(const char **str_arr, const char *separator);
 char *goblin_replace_first_cstr(const char *src, const char *search, const char *replace);
 char *goblin_replace_cstr(const char *src, const char *search, const char *replace);
 
+/*
+    Returns array of strings or NULL if something went wrong
+*/
+char **goblin_split_cstr(const char *src, const char *delimiter);
+
 #ifdef __cplusplus
 }
 namespace goblin {
@@ -94,6 +99,8 @@ namespace goblin {
 
     static inline char *replace_first_cstr(const char *src, const char *search, const char *replace) { return goblin_replace_first_cstr(src, search, replace); }
     static inline char *replace_cstr(const char *src, const char *search, const char *replace) { return goblin_replace_cstr(src, search, replace); }
+
+    static inline char **split_cstr(const char *src, const char *delimiter) { return goblin_split_cstr(src, delimiter); }
 }
 #endif
 
@@ -453,6 +460,57 @@ char *goblin_replace_cstr(const char *src, const char *search, const char *repla
     result[new_len] = '\0';
 
     return result;
+}
+
+char **goblin_split_cstr(const char *src, const char *delimiter)
+{
+    if (!src || !delimiter || *delimiter == '\0') {
+        return NULL;
+    }
+
+    size_t delim_len = strlen(delimiter);
+    size_t count = 0;
+    size_t cap = 4;
+
+    char **out = malloc((cap + 1) * sizeof *out);
+    if (!out) return NULL;
+
+    while (1) {
+        const char *p = strstr(src, delimiter);
+        size_t len = p ? (size_t)(p - src) : strlen(src);
+
+        char *tok = malloc(len + 1);
+        if (!tok) goto fail;
+
+        memcpy(tok, src, len);
+        tok[len] = '\0';
+
+        if (count == cap) {
+            size_t new_cap = cap * 2;
+            char **tmp = realloc(out, (new_cap + 1) * sizeof *out);
+            if (!tmp) {
+                free(tok);
+                goto fail;
+            }
+            out = tmp;
+            cap = new_cap;
+        }
+
+        out[count++] = tok;
+
+        if (!p) break;
+        src = p + delim_len;
+    }
+
+    out[count] = NULL;
+    return out;
+
+fail: // I don't like goto but it works nicely there
+    while (count > 0) {
+        free(out[--count]);
+    }
+    free(out);
+    return NULL;
 }
 
 #endif // GOBLIN_CSTR_IMPLEMENTATION

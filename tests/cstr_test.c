@@ -345,6 +345,88 @@ static void test_replace(void)
     assert(goblin_replace_cstr("a", "b", NULL) == NULL);
 }
 
+static void free_split_cstr(char **arr)
+{
+    if (!arr) {
+        return;
+    }
+
+    for (size_t i = 0; arr[i] != NULL; ++i) {
+        free(arr[i]);
+    }
+    free(arr);
+}
+
+static void assert_split_eq(char **arr, const char *expected[], size_t n)
+{
+    assert(arr != NULL);
+
+    for (size_t i = 0; i < n; ++i) {
+        assert(arr[i] != NULL);
+        assert(strcmp(arr[i], expected[i]) == 0);
+    }
+
+    assert(arr[n] == NULL);
+}
+
+static void test_split(void)
+{
+    char **s;
+
+    {
+        const char *expected[] = {"hello"};
+        s = goblin_split_cstr("hello", ",");
+        assert_split_eq(s, expected, 1);
+        free_split_cstr(s);
+    }
+
+    {
+        const char *expected[] = {"a", "b", "c"};
+        s = goblin_split_cstr("a,b,c", ",");
+        assert_split_eq(s, expected, 3);
+        free_split_cstr(s);
+    }
+
+    {
+        const char *expected[] = {"hello", "world"};
+        s = goblin_split_cstr("hello::world", "::");
+        assert_split_eq(s, expected, 2);
+        free_split_cstr(s);
+    }
+
+    {
+        const char *expected[] = {""};
+        s = goblin_split_cstr("", ",");
+        assert_split_eq(s, expected, 1);
+        free_split_cstr(s);
+    }
+
+    {
+        const char *expected[] = {"", "a", "b", ""};
+        s = goblin_split_cstr(",a,b,", ",");
+        assert_split_eq(s, expected, 4);
+        free_split_cstr(s);
+    }
+
+    {
+        const char *expected[] = {"", "", ""};
+        s = goblin_split_cstr("----", "--");
+        assert_split_eq(s, expected, 3);
+        free_split_cstr(s);
+    }
+
+    {
+        const char *expected[] = {"abc"};
+        s = goblin_split_cstr("abc", "abcd");
+        assert_split_eq(s, expected, 1);
+        free_split_cstr(s);
+    }
+
+    assert(goblin_split_cstr(NULL, ",") == NULL);
+    assert(goblin_split_cstr("a,b,c", NULL) == NULL);
+    assert(goblin_split_cstr("a,b,c", "") == NULL);
+}
+
 int main(void)
 {
     test_copy();
@@ -362,6 +444,7 @@ int main(void)
     test_to_lower();
     test_replace_first();
     test_replace();
+    test_split();
 
     puts("cstr tests passed");
     return 0;
