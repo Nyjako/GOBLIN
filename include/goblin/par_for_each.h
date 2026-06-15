@@ -58,14 +58,14 @@ int goblin_par_for_each_shared(void *arr, size_t count, size_t elem_size, void *
 #ifdef __cplusplus
 }
 namespace goblin {
-    static inline int par_for_each(void *arr, size_t count, size_t elem_size, goblin_par_for_each_fn fn, size_t max_threads) { 
-        return goblin_par_for_each(arr, count, elem_size, fn, max_threads); 
+    static inline int par_for_each(void *arr, size_t count, size_t elem_size, goblin_par_for_each_fn fn, size_t max_threads) {
+        return goblin_par_for_each(arr, count, elem_size, fn, max_threads);
     }
-    static inline int par_for_each_zip(void *arr, void *user_arr, size_t count, size_t elem_size, size_t user_elem_size, goblin_par_for_each_zip_fn fn, size_t max_threads) { 
-        return goblin_par_for_each_zip(arr, user_arr, count, elem_size, user_elem_size, fn, max_threads); 
+    static inline int par_for_each_zip(void *arr, void *user_arr, size_t count, size_t elem_size, size_t user_elem_size, goblin_par_for_each_zip_fn fn, size_t max_threads) {
+        return goblin_par_for_each_zip(arr, user_arr, count, elem_size, user_elem_size, fn, max_threads);
     }
-    static inline int par_for_each_shared(void *arr, size_t count, size_t elem_size, void *user_elem, mtx_t *mutex, goblin_par_for_each_shared_fn fn, size_t max_threads) { 
-        return goblin_par_for_each_shared(arr, count, elem_size, user_elem, mutex, fn, max_threads); 
+    static inline int par_for_each_shared(void *arr, size_t count, size_t elem_size, void *user_elem, mtx_t *mutex, goblin_par_for_each_shared_fn fn, size_t max_threads) {
+        return goblin_par_for_each_shared(arr, count, elem_size, user_elem, mutex, fn, max_threads);
     }
 }
 #endif
