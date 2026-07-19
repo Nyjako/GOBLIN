@@ -33,7 +33,7 @@ jobs:
               name="${name%.*}"
             fi
             exe="build/tests/$name-$CC"
-            "$CC" -Wall -Wextra -pedantic -std="$std" -I. "$src" -o "$exe"
+            "$CC" -Wall -Wextra -pedantic -std="$std" -I. "$src" -o "$exe" -lX11
             "$exe"
           done
 
@@ -52,6 +52,6 @@ jobs:
           for src in tests/*.c; do
             name=$(basename "$src" .c)
             exe="build/tests/$name-asan"
-            clang -g -O1 -fsanitize=address -fno-omit-frame-pointer -I. "$src" -o "$exe"
+            clang -g -O1 -fsanitize=address -fno-omit-frame-pointer -I. "$src" -o "$exe" -lX11
             ASAN_OPTIONS=detect_leaks=1 "$exe"
           done
