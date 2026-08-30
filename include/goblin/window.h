@@ -1,39 +1,39 @@
 /*
-    GOBLIN by Kacper Tucholski
-    https://github.com/Nyjako/GOBLIN
-
-    window.h - tiny header-only window creation + raw framebuffer drawing.
-
-    * No SDL, no GLFW, no OpenGL, no external dependencies.
-    * Just the OS: Win32 on Windows, Xlib on Linux/Unix.
-    * You get an array of uint32_t pixels (0x00RRGGBB) and you draw into it
-      yourself. goblin_window_present() blits it to the screen.
-
-    Usage:
-        #define GOBLIN_WINDOW_IMPLEMENTATION
-        #include "goblin/window.h"
-
-    On Linux you must link against X11:
-        cc app.c -o app -lX11
-
-    On Windows the required libs (gdi32, user32) are pulled in automatically
-    via #pragma comment when compiling with MSVC; with MinGW add -lgdi32
-    -luser32 if they are not linked by default.
-
-    Quick example:
-
-        goblin_window *win = goblin_window_create(640, 480, "hello");
-        while (!goblin_window_should_close(win)) {
-            goblin_window_poll_events(win);
-
-            uint32_t *px = goblin_window_pixels(win);
-            for (int i = 0; i < goblin_window_width(win) * goblin_window_height(win); i++)
-                px[i] = 0x00202020;
-
-            goblin_window_present(win);
-        }
-        goblin_window_destroy(win);
-*/
+ *    GOBLIN by Kacper Tucholski
+ *    https://github.com/Nyjako/GOBLIN
+ *
+ *    window.h - tiny header-only window creation + raw framebuffer drawing.
+ *
+ * No SDL, no GLFW, no OpenGL, no external dependencies.
+ * Just the OS: Win32 on Windows, Xlib on Linux/Unix.
+ * You get an array of uint32_t pixels (0x00RRGGBB) and you draw into it
+ *      yourself. goblin_window_present() blits it to the screen.
+ *
+ *    Usage:
+ *        #define GOBLIN_WINDOW_IMPLEMENTATION
+ *        #include "goblin/window.h"
+ *
+ *    On Linux you must link against X11:
+ *        cc app.c -o app -lX11
+ *
+ *    On Windows the required libs (gdi32, user32) are pulled in automatically
+ *    via #pragma comment when compiling with MSVC; with MinGW add -lgdi32
+ *    -luser32 if they are not linked by default.
+ *
+ *    Quick example:
+ *
+ *        goblin_window *win = goblin_window_create(640, 480, "hello");
+ *        while (!goblin_window_should_close(win)) {
+ *            goblin_window_poll_events(win);
+ *
+ *            uint32_t *px = goblin_window_pixels(win);
+ *            for (int i = 0; i < goblin_window_width(win) * goblin_window_height(win); i++)
+ *                px[i] = 0x00202020;
+ *
+ *            goblin_window_present(win);
+ *        }
+ *        goblin_window_destroy(win);
+ */
 
 #if !defined(_WIN32) && !defined(_POSIX_C_SOURCE)
 #define _POSIX_C_SOURCE 200809L
@@ -52,7 +52,7 @@ extern "C" {
 
 /* Pack an 0x00RRGGBB pixel. */
 #define GOBLIN_RGB(r, g, b) \
-    ((uint32_t)(((uint32_t)(r) << 16) | ((uint32_t)(g) << 8) | (uint32_t)(b)))
+((uint32_t)(((uint32_t)(r) << 16) | ((uint32_t)(g) << 8) | (uint32_t)(b)))
 
 typedef enum goblin_key {
     GOBLIN_KEY_UNKNOWN = 0,
@@ -112,8 +112,8 @@ void goblin_window_poll_events(goblin_window *win);
 void goblin_window_present(goblin_window *win);
 
 /* Raw framebuffer: width * height uint32_t pixels, 0x00RRGGBB, row-major,
-   top-left origin. Pointer is only valid until the next poll_events() call
-   that resizes the window - call goblin_window_pixels() again after that. */
+    *   top-left origin. Pointer is only valid until the next poll_events() call
+    *   that resizes the window - call goblin_window_pixels() again after that. */
 uint32_t *goblin_window_pixels(goblin_window *win);
 int goblin_window_width(const goblin_window *win);
 int goblin_window_height(const goblin_window *win);
@@ -127,6 +127,23 @@ bool goblin_window_key_released(const goblin_window *win, goblin_key key);
 
 void goblin_window_mouse_pos(const goblin_window *win, int *x, int *y);
 bool goblin_window_mouse_down(const goblin_window *win, goblin_mouse_button button);
+
+/* Mouse movement since the last poll_events() call. Works whether or not
+    *   the mouse is locked - with locking on this is what you want for camera
+    *   controls, since mouse_pos() just sits at the window center. */
+void goblin_window_mouse_delta(const goblin_window *win, int *dx, int *dy);
+
+/* Scroll wheel movement since the last poll_events() call, in notches
+    *   (usually +-1 per click). dx is horizontal (shift-scroll / tilt wheel),
+    *   dy is vertical. Both reset to 0 every poll_events() call. */
+void goblin_window_mouse_scroll(const goblin_window *win, int *dx, int *dy);
+
+/* Hides the cursor and confines it to the window by re-centering it every
+    *   poll_events() call. goblin_window_mouse_pos() will stay pinned to the
+    *   window center while locked - use goblin_window_mouse_delta() to read
+    *   movement instead. Call with false to release the cursor again. */
+void goblin_window_set_mouse_locked(goblin_window *win, bool locked);
+bool goblin_window_mouse_locked(const goblin_window *win);
 
 /* Seconds since the first call to this function on this thread. Monotonic. */
 double goblin_window_time(void);
@@ -155,6 +172,10 @@ namespace goblin {
     static inline bool key_released(const Window *win, Key key) { return goblin_window_key_released(win, key); }
     static inline void mouse_pos(const Window *win, int *x, int *y) { goblin_window_mouse_pos(win, x, y); }
     static inline bool mouse_down(const Window *win, MouseButton button) { return goblin_window_mouse_down(win, button); }
+    static inline void mouse_delta(const Window *win, int *dx, int *dy) { goblin_window_mouse_delta(win, dx, dy); }
+    static inline void mouse_scroll(const Window *win, int *dx, int *dy) { goblin_window_mouse_scroll(win, dx, dy); }
+    static inline void set_mouse_locked(Window *win, bool locked) { goblin_window_set_mouse_locked(win, locked); }
+    static inline bool mouse_locked(const Window *win) { return goblin_window_mouse_locked(win); }
     static inline double time_seconds(void) { return goblin_window_time(); }
     static inline void sleep_ms(unsigned int ms) { goblin_window_sleep_ms(ms); }
 }
@@ -174,6 +195,8 @@ struct goblin_window_input_state {
     bool keys_prev[GOBLIN_KEY_COUNT];
     bool mouse_buttons[GOBLIN_MOUSE_COUNT];
     int mouse_x, mouse_y;
+    int mouse_dx, mouse_dy;   /* movement since last poll_events() */
+    int scroll_dx, scroll_dy; /* wheel notches since last poll_events() */
 };
 
 /* ===================================================================== */
@@ -200,6 +223,7 @@ struct goblin_window {
     int width, height;
     bool should_close;
     bool resized;
+    bool mouse_locked;
     uint32_t *pixels;
     BITMAPINFO bmi;
     struct goblin_window_input_state input;
@@ -296,9 +320,22 @@ static LRESULT CALLBACK goblin_window__wndproc(HWND hwnd, UINT msg, WPARAM wpara
         case WM_MBUTTONDOWN: win->input.mouse_buttons[GOBLIN_MOUSE_MIDDLE] = true; return 0;
         case WM_MBUTTONUP:   win->input.mouse_buttons[GOBLIN_MOUSE_MIDDLE] = false; return 0;
 
-        case WM_MOUSEMOVE:
-            win->input.mouse_x = GET_X_LPARAM(lparam);
-            win->input.mouse_y = GET_Y_LPARAM(lparam);
+        case WM_MOUSEMOVE: {
+            int x = GET_X_LPARAM(lparam);
+            int y = GET_Y_LPARAM(lparam);
+            win->input.mouse_dx += x - win->input.mouse_x;
+            win->input.mouse_dy += y - win->input.mouse_y;
+            win->input.mouse_x = x;
+            win->input.mouse_y = y;
+            return 0;
+        }
+
+        case WM_MOUSEWHEEL:
+            win->input.scroll_dy += GET_WHEEL_DELTA_WPARAM(wparam) / WHEEL_DELTA;
+            return 0;
+
+        case WM_MOUSEHWHEEL:
+            win->input.scroll_dx += GET_WHEEL_DELTA_WPARAM(wparam) / WHEEL_DELTA;
             return 0;
 
         case WM_DESTROY:
@@ -382,10 +419,50 @@ void goblin_window_poll_events(goblin_window *win)
 
     memcpy(win->input.keys_prev, win->input.keys, sizeof(win->input.keys));
     win->resized = false;
+    win->input.mouse_dx = 0;
+    win->input.mouse_dy = 0;
+    win->input.scroll_dx = 0;
+    win->input.scroll_dy = 0;
 
     while (PeekMessageW(&msg, win->hwnd, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
         DispatchMessageW(&msg);
+    }
+
+    if (win->mouse_locked) {
+        RECT rect;
+        GetClientRect(win->hwnd, &rect);
+        int cx = (rect.right - rect.left) / 2;
+        int cy = (rect.bottom - rect.top) / 2;
+        POINT screen_center = { cx, cy };
+        ClientToScreen(win->hwnd, &screen_center);
+        SetCursorPos(screen_center.x, screen_center.y);
+        win->input.mouse_x = cx;
+        win->input.mouse_y = cy;
+    }
+}
+
+void goblin_window_set_mouse_locked(goblin_window *win, bool locked)
+{
+    if (win->mouse_locked == locked) return;
+    win->mouse_locked = locked;
+
+    if (locked) {
+        SetCapture(win->hwnd);
+        ShowCursor(FALSE);
+
+        RECT rect;
+        GetClientRect(win->hwnd, &rect);
+        int cx = (rect.right - rect.left) / 2;
+        int cy = (rect.bottom - rect.top) / 2;
+        POINT screen_center = { cx, cy };
+        ClientToScreen(win->hwnd, &screen_center);
+        SetCursorPos(screen_center.x, screen_center.y);
+        win->input.mouse_x = cx;
+        win->input.mouse_y = cy;
+    } else {
+        ReleaseCapture();
+        ShowCursor(TRUE);
     }
 }
 
@@ -393,9 +470,9 @@ void goblin_window_present(goblin_window *win)
 {
     HDC hdc = GetDC(win->hwnd);
     StretchDIBits(hdc,
-        0, 0, win->width, win->height,
-        0, 0, win->width, win->height,
-        win->pixels, &win->bmi, DIB_RGB_COLORS, SRCCOPY);
+                  0, 0, win->width, win->height,
+                  0, 0, win->width, win->height,
+                  win->pixels, &win->bmi, DIB_RGB_COLORS, SRCCOPY);
     ReleaseDC(win->hwnd, hdc);
 }
 
@@ -439,9 +516,23 @@ struct goblin_window {
     int width, height;
     bool should_close;
     bool resized;
+    bool mouse_locked;
+    Cursor hidden_cursor;
     uint32_t *pixels;
     struct goblin_window_input_state input;
 };
+
+/* A cursor with no pixmap, i.e. an invisible cursor - the standard Xlib
+ *   trick since there is no direct "hide cursor" call. */
+static Cursor goblin_window__create_hidden_cursor(Display *display, Window window)
+{
+    char data[1] = { 0 };
+    XColor dummy;
+    Pixmap blank = XCreateBitmapFromData(display, window, data, 1, 1);
+    Cursor cursor = XCreatePixmapCursor(display, blank, blank, &dummy, &dummy, 0, 0);
+    XFreePixmap(display, blank);
+    return cursor;
+}
 
 static goblin_key goblin_window__keysym_to_key(KeySym sym)
 {
@@ -499,12 +590,12 @@ goblin_window *goblin_window_create(int width, int height, const char *title)
     unsigned long white = WhitePixel(win->display, screen);
 
     win->handle = XCreateSimpleWindow(win->display, root, 0, 0,
-        (unsigned int)width, (unsigned int)height, 0, black, white);
+                                      (unsigned int)width, (unsigned int)height, 0, black, white);
 
     XSelectInput(win->display, win->handle,
-        ExposureMask | KeyPressMask | KeyReleaseMask |
-        ButtonPressMask | ButtonReleaseMask | PointerMotionMask |
-        StructureNotifyMask);
+                 ExposureMask | KeyPressMask | KeyReleaseMask |
+                 ButtonPressMask | ButtonReleaseMask | PointerMotionMask |
+                 StructureNotifyMask);
 
     XStoreName(win->display, win->handle, title ? title : "goblin window");
 
@@ -525,6 +616,7 @@ goblin_window *goblin_window_create(int width, int height, const char *title)
 void goblin_window_destroy(goblin_window *win)
 {
     if (!win) return;
+    if (win->hidden_cursor != None) XFreeCursor(win->display, win->hidden_cursor);
     if (win->gc) XFreeGC(win->display, win->gc);
     if (win->handle) XDestroyWindow(win->display, win->handle);
     if (win->display) XCloseDisplay(win->display);
@@ -538,6 +630,10 @@ void goblin_window_poll_events(goblin_window *win)
 
     memcpy(win->input.keys_prev, win->input.keys, sizeof(win->input.keys));
     win->resized = false;
+    win->input.mouse_dx = 0;
+    win->input.mouse_dy = 0;
+    win->input.scroll_dx = 0;
+    win->input.scroll_dy = 0;
 
     while (XPending(win->display) > 0) {
         XNextEvent(win->display, &ev);
@@ -546,12 +642,12 @@ void goblin_window_poll_events(goblin_window *win)
             case ClientMessage:
                 if ((Atom)ev.xclient.data.l[0] == win->wm_delete_window)
                     win->should_close = true;
-                break;
+            break;
 
             case ConfigureNotify:
                 if (ev.xconfigure.width != win->width || ev.xconfigure.height != win->height)
                     goblin_window__resize_buffer(win, ev.xconfigure.width, ev.xconfigure.height);
-                break;
+            break;
 
             case KeyPress:
             case KeyRelease: {
@@ -565,39 +661,81 @@ void goblin_window_poll_events(goblin_window *win)
             case ButtonPress:
             case ButtonRelease: {
                 bool down = (ev.type == ButtonPress);
-                if (ev.xbutton.button == Button1) win->input.mouse_buttons[GOBLIN_MOUSE_LEFT] = down;
-                else if (ev.xbutton.button == Button3) win->input.mouse_buttons[GOBLIN_MOUSE_RIGHT] = down;
-                else if (ev.xbutton.button == Button2) win->input.mouse_buttons[GOBLIN_MOUSE_MIDDLE] = down;
+                switch (ev.xbutton.button) {
+                    case Button1: win->input.mouse_buttons[GOBLIN_MOUSE_LEFT] = down; break;
+                    case Button2: win->input.mouse_buttons[GOBLIN_MOUSE_MIDDLE] = down; break;
+                    case Button3: win->input.mouse_buttons[GOBLIN_MOUSE_RIGHT] = down; break;
+                    /* X11 reports the wheel as buttons 4-7; there are no
+                     *                       XK-style names for these, so use the raw numbers. */
+                    case 4: if (down) win->input.scroll_dy += 1; break;
+                    case 5: if (down) win->input.scroll_dy -= 1; break;
+                    case 6: if (down) win->input.scroll_dx -= 1; break;
+                    case 7: if (down) win->input.scroll_dx += 1; break;
+                    default: break;
+                }
                 break;
             }
 
-            case MotionNotify:
-                win->input.mouse_x = ev.xmotion.x;
-                win->input.mouse_y = ev.xmotion.y;
-                break;
+                    case MotionNotify:
+                        win->input.mouse_dx += ev.xmotion.x - win->input.mouse_x;
+                        win->input.mouse_dy += ev.xmotion.y - win->input.mouse_y;
+                        win->input.mouse_x = ev.xmotion.x;
+                        win->input.mouse_y = ev.xmotion.y;
+                        break;
 
-            default:
-                break;
+                    default:
+                        break;
         }
+    }
+
+    if (win->mouse_locked) {
+        int cx = win->width / 2;
+        int cy = win->height / 2;
+        XWarpPointer(win->display, None, win->handle, 0, 0, 0, 0, cx, cy);
+        win->input.mouse_x = cx;
+        win->input.mouse_y = cy;
+        XFlush(win->display);
+    }
+}
+
+void goblin_window_set_mouse_locked(goblin_window *win, bool locked)
+{
+    if (win->mouse_locked == locked) return;
+    win->mouse_locked = locked;
+
+    if (locked) {
+        if (win->hidden_cursor == None)
+            win->hidden_cursor = goblin_window__create_hidden_cursor(win->display, win->handle);
+        XDefineCursor(win->display, win->handle, win->hidden_cursor);
+
+        int cx = win->width / 2;
+        int cy = win->height / 2;
+        XWarpPointer(win->display, None, win->handle, 0, 0, 0, 0, cx, cy);
+        win->input.mouse_x = cx;
+        win->input.mouse_y = cy;
+        XFlush(win->display);
+    } else {
+        XUndefineCursor(win->display, win->handle);
+        XFlush(win->display);
     }
 }
 
 void goblin_window_present(goblin_window *win)
 {
     XImage *image = XCreateImage(win->display,
-        DefaultVisual(win->display, DefaultScreen(win->display)),
-        (unsigned int)DefaultDepth(win->display, DefaultScreen(win->display)),
-        ZPixmap, 0, (char *)win->pixels,
-        (unsigned int)win->width, (unsigned int)win->height,
-        32, 0);
+                                 DefaultVisual(win->display, DefaultScreen(win->display)),
+                                 (unsigned int)DefaultDepth(win->display, DefaultScreen(win->display)),
+                                 ZPixmap, 0, (char *)win->pixels,
+                                 (unsigned int)win->width, (unsigned int)win->height,
+                                 32, 0);
 
     if (!image) return;
 
     XPutImage(win->display, win->handle, win->gc, image,
-        0, 0, 0, 0, (unsigned int)win->width, (unsigned int)win->height);
+              0, 0, 0, 0, (unsigned int)win->width, (unsigned int)win->height);
 
     /* The pixel buffer is owned by goblin_window, not by the XImage: detach
-       it before destroying so XDestroyImage doesn't free() our buffer. */
+     *       it before destroying so XDestroyImage doesn't free() our buffer. */
     image->data = NULL;
     XDestroyImage(image);
 
@@ -617,7 +755,7 @@ double goblin_window_time(void)
 
     clock_gettime(CLOCK_MONOTONIC, &now);
     return (double)(now.tv_sec - start.tv_sec) +
-           (double)(now.tv_nsec - start.tv_nsec) / 1e9;
+    (double)(now.tv_nsec - start.tv_nsec) / 1e9;
 }
 
 void goblin_window_sleep_ms(unsigned int ms)
@@ -694,6 +832,23 @@ bool goblin_window_mouse_down(const goblin_window *win, goblin_mouse_button butt
 {
     if (button < 0 || button >= GOBLIN_MOUSE_COUNT) return false;
     return win->input.mouse_buttons[button];
+}
+
+void goblin_window_mouse_delta(const goblin_window *win, int *dx, int *dy)
+{
+    if (dx) *dx = win->input.mouse_dx;
+    if (dy) *dy = win->input.mouse_dy;
+}
+
+void goblin_window_mouse_scroll(const goblin_window *win, int *dx, int *dy)
+{
+    if (dx) *dx = win->input.scroll_dx;
+    if (dy) *dy = win->input.scroll_dy;
+}
+
+bool goblin_window_mouse_locked(const goblin_window *win)
+{
+    return win->mouse_locked;
 }
 
 #endif /* GOBLIN_WINDOW_IMPLEMENTATION */
