@@ -143,8 +143,76 @@ static void test_fseek64_and_ftell64(void)
     fclose(f);
 }
 
+static void test_mkdir_creates_new_directory(void)
+{
+    const char *path = "goblin_test_dir_1";
+
+    /* start from a clean state in case a previous failed run left it behind */
+    remove(path);
+
+    assert(goblin_path_exists(path) == false);
+    assert(goblin_mkdir(path) == true);
+    assert(goblin_path_exists(path) == true);
+
+#if defined(_WIN32)
+    _rmdir(path);
+#else
+    rmdir(path);
+#endif
+}
+
+static void test_mkdir_on_existing_directory_is_success(void)
+{
+    const char *path = "goblin_test_dir_2";
+
+    remove(path);
+    assert(goblin_mkdir(path) == true);
+
+    /* creating it again must still report success, not fail because it
+     * already exists */
+    assert(goblin_mkdir(path) == true);
+
+#if defined(_WIN32)
+    _rmdir(path);
+#else
+    rmdir(path);
+#endif
+}
+
+static void test_mkdir_null_path_returns_false(void)
+{
+    assert(goblin_mkdir(NULL) == false);
+}
+
+static void test_path_exists_on_file(void)
+{
+    const char *path = "goblin_test_file_1.tmp";
+    remove(path);
+
+    assert(goblin_path_exists(path) == false);
+
+    FILE *f = fopen(path, "wb");
+    assert(f != NULL);
+    fclose(f);
+
+    assert(goblin_path_exists(path) == true);
+
+    remove(path);
+    assert(goblin_path_exists(path) == false);
+}
+
+static void test_path_exists_null_path_returns_false(void)
+{
+    assert(goblin_path_exists(NULL) == false);
+}
+
 int main(void) {
     test_fseek64_and_ftell64();
+    test_mkdir_creates_new_directory();
+    test_mkdir_on_existing_directory_is_success();
+    test_mkdir_null_path_returns_false();
+    test_path_exists_on_file();
+    test_path_exists_null_path_returns_false();
     test_read_line_empty_file_returns_null();
     test_read_line_single_line_with_newline();
     test_read_line_single_line_without_newline();
