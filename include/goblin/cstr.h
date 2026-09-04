@@ -20,9 +20,9 @@
 #ifdef _WIN32
     #ifndef _SSIZE_T_DEFINED
     #ifdef  _WIN64
-    typedef unsigned __int64    ssize_t;
+    typedef __int64             ssize_t;
     #else
-    typedef _W64 unsigned int   ssize_t;
+    typedef _W64 int            ssize_t;
     #endif
     #define _SSIZE_T_DEFINED
     #endif
