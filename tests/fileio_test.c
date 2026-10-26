@@ -206,6 +206,23 @@ static void test_path_exists_null_path_returns_false(void)
     assert(goblin_path_exists(NULL) == false);
 }
 
+static void test_path_writable_on_a_writable_directory(void)
+{
+    assert(goblin_path_writable(".") == true);
+}
+
+static void test_path_writable_on_a_nonexistent_path_is_false(void)
+{
+    const char *path = "goblin_test_dir_does_not_exist";
+    remove(path);
+    assert(goblin_path_writable(path) == false);
+}
+
+static void test_path_writable_null_path_returns_false(void)
+{
+    assert(goblin_path_writable(NULL) == false);
+}
+
 int main(void) {
     test_fseek64_and_ftell64();
     test_mkdir_creates_new_directory();
@@ -213,6 +230,9 @@ int main(void) {
     test_mkdir_null_path_returns_false();
     test_path_exists_on_file();
     test_path_exists_null_path_returns_false();
+    test_path_writable_on_a_writable_directory();
+    test_path_writable_on_a_nonexistent_path_is_false();
+    test_path_writable_null_path_returns_false();
     test_read_line_empty_file_returns_null();
     test_read_line_single_line_with_newline();
     test_read_line_single_line_without_newline();

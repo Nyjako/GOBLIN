@@ -50,6 +50,8 @@ char *goblin_read_line(FILE *fp, size_t initial_cap, size_t *out_len);
 bool goblin_mkdir(const char *path);
 bool goblin_path_exists(const char *path);
 
+bool goblin_path_writable(const char *path);
+
 #ifdef __cplusplus
 }
 namespace goblin {
@@ -58,6 +60,7 @@ namespace goblin {
     static inline char *read_line(FILE *fp, size_t initial_cap, size_t *out_len) { return goblin_read_line(fp, initial_cap, out_len); }
     static inline bool mkdir(const char *path) { return goblin_mkdir(path); }
     static inline bool path_exists(const char *path) { return goblin_path_exists(path); }
+    static inline bool path_writable(const char *path) { return goblin_path_writable(path); }
 }
 #endif
 
@@ -92,6 +95,12 @@ namespace goblin {
         return _access(path, 0) == 0;
     }
 
+    bool goblin_path_writable(const char *path)
+    {
+        if (!path) return false;
+        return _access(path, 2) == 0;
+    }
+
 #else
 
     #include <errno.h>
@@ -124,6 +133,12 @@ namespace goblin {
     {
         if (!path) return false;
         return access(path, F_OK) == 0;
+    }
+
+    bool goblin_path_writable(const char *path)
+    {
+        if (!path) return false;
+        return access(path, W_OK) == 0;
     }
 
 #endif
