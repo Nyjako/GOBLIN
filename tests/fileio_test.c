@@ -223,6 +223,75 @@ static void test_path_writable_null_path_returns_false(void)
     assert(goblin_path_writable(NULL) == false);
 }
 
+static void test_read_file_returns_full_contents_and_len(void)
+{
+    const char *path = "goblin_test_read_file_1.tmp";
+    remove(path);
+
+    FILE *f = fopen(path, "wb");
+    assert(f != NULL);
+    fwrite("hello\0world", 1, 11, f); /* embedded NUL -- out_len must still say 11 */
+    fclose(f);
+
+    size_t len = 0;
+    char *contents = goblin_read_file(path, &len);
+    assert(contents != NULL);
+    assert(len == 11);
+    assert(memcmp(contents, "hello\0world", 11) == 0);
+
+    free(contents);
+    remove(path);
+}
+
+static void test_read_file_result_is_nul_terminated_even_without_out_len(void)
+{
+    const char *path = "goblin_test_read_file_2.tmp";
+    remove(path);
+
+    FILE *f = fopen(path, "wb");
+    assert(f != NULL);
+    fputs("plain text", f);
+    fclose(f);
+
+    char *contents = goblin_read_file(path, NULL);
+    assert(contents != NULL);
+    assert(strcmp(contents, "plain text") == 0);
+
+    free(contents);
+    remove(path);
+}
+
+static void test_read_file_empty_file_returns_empty_string(void)
+{
+    const char *path = "goblin_test_read_file_3.tmp";
+    remove(path);
+
+    FILE *f = fopen(path, "wb");
+    assert(f != NULL);
+    fclose(f);
+
+    size_t len = 123;
+    char *contents = goblin_read_file(path, &len);
+    assert(contents != NULL);
+    assert(len == 0);
+    assert(contents[0] == '\0');
+
+    free(contents);
+    remove(path);
+}
+
+static void test_read_file_nonexistent_path_returns_null(void)
+{
+    const char *path = "goblin_test_read_file_does_not_exist.tmp";
+    remove(path);
+    assert(goblin_read_file(path, NULL) == NULL);
+}
+
+static void test_read_file_null_path_returns_null(void)
+{
+    assert(goblin_read_file(NULL, NULL) == NULL);
+}
+
 int main(void) {
     test_fseek64_and_ftell64();
     test_mkdir_creates_new_directory();
@@ -240,6 +309,11 @@ int main(void) {
     test_read_line_long_line_grows_buffer();
     test_read_line_null_fp_returns_null();
     test_read_line_zero_initial_capacity_returns_null();
+    test_read_file_returns_full_contents_and_len();
+    test_read_file_result_is_nul_terminated_even_without_out_len();
+    test_read_file_empty_file_returns_empty_string();
+    test_read_file_nonexistent_path_returns_null();
+    test_read_file_null_path_returns_null();
 
     puts("fileio tests passed");
     return 0;

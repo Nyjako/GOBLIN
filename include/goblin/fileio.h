@@ -40,6 +40,16 @@ int64_t goblin_ftell64(FILE *stream);
 
 char *goblin_read_line(FILE *fp, size_t initial_cap, size_t *out_len);
 
+/*
+    Reads the whole file at path into a single malloc'd, NUL-terminated
+    buffer (safe to treat as text even if out_len is ignored) and returns
+    it, or NULL if the path doesn't open or an allocation fails. *out_len
+    (if given) receives the byte count actually read, not counting the
+    appended NUL - the only way to tell a binary file's real size apart
+    from a NUL byte it happens to contain.
+*/
+char *goblin_read_file(const char *path, size_t *out_len);
+
 /* Cross-platform directory/path helpers. The underlying functions
  * (mkdir/access on POSIX, _mkdir/_access on Windows) and the headers
  * that declare them (<unistd.h>, <sys/stat.h> vs <direct.h>, <io.h>)
@@ -58,6 +68,7 @@ namespace goblin {
     static inline int fseek64(FILE *stream, int64_t offset, int origin) { return goblin_fseek64(stream, offset, origin); }
     static inline int64_t ftell64(FILE *stream) { return goblin_ftell64(stream); }
     static inline char *read_line(FILE *fp, size_t initial_cap, size_t *out_len) { return goblin_read_line(fp, initial_cap, out_len); }
+    static inline char *read_file(const char *path, size_t *out_len) { return goblin_read_file(path, out_len); }
     static inline bool mkdir(const char *path) { return goblin_mkdir(path); }
     static inline bool path_exists(const char *path) { return goblin_path_exists(path); }
     static inline bool path_writable(const char *path) { return goblin_path_writable(path); }
@@ -192,6 +203,43 @@ char *goblin_read_line(FILE *fp, size_t initial_cap, size_t *out_len)
         *out_len = len;
     }
 
+    return buf;
+}
+
+char *goblin_read_file(const char *path, size_t *out_len)
+{
+    if (!path) {
+        return NULL;
+    }
+
+    FILE *f = fopen(path, "rb");
+    if (!f) {
+        return NULL;
+    }
+
+    if (goblin_fseek64(f, 0, SEEK_END) != 0) {
+        fclose(f);
+        return NULL;
+    }
+    int64_t size = goblin_ftell64(f);
+    if (size < 0 || goblin_fseek64(f, 0, SEEK_SET) != 0) {
+        fclose(f);
+        return NULL;
+    }
+
+    char *buf = malloc((size_t)size + 1);
+    if (!buf) {
+        fclose(f);
+        return NULL;
+    }
+
+    size_t read = fread(buf, 1, (size_t)size, f);
+    fclose(f);
+    buf[read] = '\0';
+
+    if (out_len) {
+        *out_len = read;
+    }
     return buf;
 }
 
