@@ -33,6 +33,52 @@ Since everything is header-only, installation is just:
 2. Add this repository as a submodule, or
 3. Add the repo path to your compiler include directories.
 
+## Headers
+
+**Strings & text**
+
+| Header | What it does |
+| --- | --- |
+| `cstr.h` | Small helpers for C strings (trim, case, search) |
+| `ascii_transliterate.h` | Turns text into plain ASCII letters |
+| `sanitize_filename.h` | Makes a string safe to use as a file name |
+
+**Encoding & hashing**
+
+| Header | What it does |
+| --- | --- |
+| `hex.h` | Converts bytes to and from hex text |
+| `base64.h` | Encodes and decodes Base64 |
+| `url.h` | Encodes and decodes URLs |
+| `fnv1a.h` | Fast FNV-1a hash function |
+| `md5.h` | Computes MD5 hashes |
+| `secure_compare.h` | Compares secrets without leaking timing info |
+
+**Files & system**
+
+| Header | What it does |
+| --- | --- |
+| `fileio.h` | Helpers for files and paths (big files, line reading) |
+| `appdirs.h` | Finds the app's data, config, and cache folders |
+| `env.h` | Reads and writes environment variables |
+
+**Concurrency & timing**
+
+| Header | What it does |
+| --- | --- |
+| `thread.h` | Cross-platform threads, mutexes, and conditions |
+| `par_for_each.h` | Runs a loop over an array using multiple threads |
+| `rate_limit.h` | Limits how often something can run |
+| `high_res_timer.h` | A high-resolution timer for measuring time |
+
+**Other**
+
+| Header | What it does |
+| --- | --- |
+| `dyn_array.h` | A growable array (like a simple vector) |
+| `diagnostic.h` | Macros for TODOs, unreachable code, and fatal errors |
+| `window.h` | Opens a window and draws to its pixels |
+
 ## License
 
 This project is dual-licensed under:
