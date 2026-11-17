@@ -61,6 +61,7 @@ Since everything is header-only, installation is just:
 | `fileio.h` | Helpers for files and paths (big files, line reading) |
 | `appdirs.h` | Finds the app's data, config, and cache folders |
 | `env.h` | Reads and writes environment variables |
+| `zip.h` | Reads and writes simple, uncompressed ZIP files |
 
 **Concurrency & timing**
 
@@ -70,6 +71,14 @@ Since everything is header-only, installation is just:
 | `par_for_each.h` | Runs a loop over an array using multiple threads |
 | `rate_limit.h` | Limits how often something can run |
 | `high_res_timer.h` | A high-resolution timer for measuring time |
+
+**CLI tools**
+
+| Header | What it does |
+| --- | --- |
+| `argv.h` | Small helpers for reading command-line flags |
+| `log.h` | Leveled, colored logging to stderr |
+| `secret_prompt.h` | Asks for a password without showing it on screen |
 
 **Other**
 
