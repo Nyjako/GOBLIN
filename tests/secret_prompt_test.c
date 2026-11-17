@@ -1,3 +1,7 @@
+#if !defined(_WIN32) && !defined(_POSIX_C_SOURCE)
+#define _POSIX_C_SOURCE 200809L /* for fileno() under -std=c99 -pedantic */
+#endif
+
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -6,13 +10,16 @@
 #include "../include/goblin/secret_prompt.h"
 
 #ifdef _WIN32
+#include <fcntl.h>
 #include <io.h>
 #define GOBLIN_PIPE(fds) _pipe((fds), 256, _O_BINARY)
 #define GOBLIN_WRITE _write
 #define GOBLIN_CLOSE _close
 #define GOBLIN_DUP _dup
 #define GOBLIN_DUP2 _dup2
+#define GOBLIN_FILENO _fileno
 #define GOBLIN_STDIN_FD 0
+#define GOBLIN_STDERR_FD 2
 #else
 #include <unistd.h>
 #define GOBLIN_PIPE(fds) pipe(fds)
@@ -20,7 +27,9 @@
 #define GOBLIN_CLOSE close
 #define GOBLIN_DUP dup
 #define GOBLIN_DUP2 dup2
+#define GOBLIN_FILENO fileno
 #define GOBLIN_STDIN_FD STDIN_FILENO
+#define GOBLIN_STDERR_FD STDERR_FILENO
 #endif
 
 /* Feeds `input` to the process's own stdin (via a pipe, swapped in for the
@@ -46,7 +55,8 @@ static void prompt_with_piped_stdin(const char *input, char *out_buf, size_t out
     GOBLIN_DUP2(fds[0], GOBLIN_STDIN_FD);
     GOBLIN_CLOSE(fds[0]);
 
-    FILE *saved_stderr_stream = stderr;
+    fflush(stderr);
+    int saved_stderr = GOBLIN_DUP(GOBLIN_STDERR_FD);
     FILE *null_stream = fopen(
 #ifdef _WIN32
         "NUL",
@@ -54,11 +64,13 @@ static void prompt_with_piped_stdin(const char *input, char *out_buf, size_t out
         "/dev/null",
 #endif
         "w");
-    if (null_stream) stderr = null_stream;
+    if (null_stream) GOBLIN_DUP2(GOBLIN_FILENO(null_stream), GOBLIN_STDERR_FD);
 
     goblin_prompt_secret("secret: ", out_buf, out_buf_size);
 
-    stderr = saved_stderr_stream;
+    fflush(stderr);
+    GOBLIN_DUP2(saved_stderr, GOBLIN_STDERR_FD);
+    GOBLIN_CLOSE(saved_stderr);
     if (null_stream) fclose(null_stream);
 
     GOBLIN_DUP2(saved_stdin, GOBLIN_STDIN_FD);
